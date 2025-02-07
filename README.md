@@ -1,3 +1,5 @@
 # electron-vite-ts
 学习electron
-test
+运行项目
+npm i
+npm run start

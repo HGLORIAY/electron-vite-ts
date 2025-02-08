@@ -2,11 +2,19 @@
   "name": "vue3-vite-ts",
   "private": true,
   "version": "0.0.0",
+  "author": "huye",
   "type": "module",
+  "main": "dist/electron/main/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "vite:dev": "vite",
+    "vite:build": "vue-tsc --noEmit && vite build",
+    "vite:preview": "vite preview",
+    "ts": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint -c .eslintrc --ext .ts ./src",
+    "app:dev": "tsc && concurrently vite \" electron .\" \"tsc -w\"",
+    "app:build": "npm run vite:build && tsc && electron-builder",
+    "app:preview": "npm run vite:build && tsc && electron ."
   },
   "dependencies": {
     "vue": "^3.5.13"
@@ -14,8 +22,34 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
+    "concurrently": "^9.1.2",
+    "electron": "^34.1.1",
+    "electron-builder": "^25.1.8",
     "typescript": "~5.7.2",
     "vite": "^6.1.0",
-    "vue-tsc": "^2.2.0"
+    "vue-tsc": "^2.2.0",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.example.electronvue3vits",
+    "productName": "Electron Vue 3 Vite TS",
+    "directories": {
+      "buildResources": "assets",
+      "output": "release/${version}"
+    },
+    "files": [
+      "dist"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
   }
 }

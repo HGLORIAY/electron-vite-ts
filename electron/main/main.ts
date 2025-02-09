@@ -5,7 +5,12 @@ import {
     ipcMain,
     dialog
 } from 'electron';
-
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+// 获取当前文件的绝对路径
+const __filename = fileURLToPath(import.meta.url);
+// 获取当前文件所在的目录
+const __dirname = dirname(__filename);
 // const isDev = process.env.npm_lifecycle_event === "app:dev" ? true : false;
 const isDev = app.isPackaged ? false : true;
 // const isDev = false;

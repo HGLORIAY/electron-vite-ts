@@ -28,7 +28,9 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: join(__dirname, '../preload/preload.js'),
+            contextIsolation: true, // 启用上下文隔离
+            nodeIntegration: false, // 禁用 Node.js 集成
+            preload: join(__dirname, '../preload/preload.js')
         },
     });
 
@@ -45,7 +47,6 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-    ipcMain.handle('dialog:openFile', handleFileOpen)
     createWindow()
     app.on('activate', function () {
         // On macOS it's common to re-create a window in the app when the

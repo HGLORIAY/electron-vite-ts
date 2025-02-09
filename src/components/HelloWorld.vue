@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
-defineProps<{ msg: string }>()
+import { onMounted, ref } from 'vue'
 
 const count = ref(0)
 
-const { myCustomAPI } = (window as any).myCustomAPI;
-myCustomAPI.doSomething();
-myCustomAPI.sendToMain('Custom message from renderer');
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.myCustomAPI) {
+    window.myCustomAPI.doSomething();
+  } else {
+    console.error('myCustomAPI is not available');
+  }
+});
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
   <div class="card">
     <button type="button" @click="count++">count is {{ count }}</button>
     <p>

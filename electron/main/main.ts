@@ -4,8 +4,10 @@ import {
     BrowserWindow,
     ipcMain,
     dialog,
-    desktopCapturer, globalShortcut,
-    systemPreferences
+    desktopCapturer,
+    globalShortcut,
+    systemPreferences,
+    screen
 } from 'electron';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -16,10 +18,10 @@ const __dirname = dirname(__filename);
 // const isDev = process.env.npm_lifecycle_event === "app:dev" ? true : false;
 const isDev = app.isPackaged ? false : true;
 // const isDev = false;
-
+const winURL = isDev ? 'http://localhost:5173' : `file://${__dirname}/../../index.html`;
 let mainWindow: BrowserWindow;
+let captureWindow: BrowserWindow;
 let isCapturing = false;
-let captureStream: MediaStream | null;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -32,36 +34,69 @@ function createWindow() {
         }
     });
     // and load the index.html of the app.
-    if (isDev) {
-        mainWindow.loadURL('http://localhost:5173');// Open the DevTools.
-        mainWindow.webContents.openDevTools();
-    } else {
-        mainWindow.loadFile(join(__dirname, '../../index.html'));
-    }
-
+    // if (isDev) {
+    mainWindow.loadURL(winURL);
+    mainWindow.webContents.openDevTools();// Open the DevTools.
+    // } else {
+    //     mainWindow.loadFile(join(__dirname, '../../index.html'));
+    // }
+    createCaptureWindow()
     registerShortcut();
 
     ipcMain.handle('get-active-window-source', async () => {
-        const sources = await desktopCapturer.getSources({ types: ['window'] });
+        const sources = await desktopCapturer.getSources({ types: ['screen', 'window'], thumbnailSize: { width: 0, height: 0 } });
         for (const source of sources) {
-            if (source.id.includes('screen')) continue;
+            if (source.id.includes('screen') || source.name == 'WeMail') continue;
+            console.log(source);
             return source.id;
         }
         return null;
     });
 }
+function createCaptureWindow() {
+    // 创建新的全屏窗口
+    captureWindow = new BrowserWindow({
+        backgroundColor: '#000',
+        fullscreen: true,
+        show: false,
+        webPreferences: {
+            contextIsolation: true, // 启用上下文隔离
+            nodeIntegration: false, // 禁用 Node.js 集成
+            preload: join(__dirname, '../preload/preload.js')
+        }
+    });
+    captureWindow.loadURL(winURL + '/capture');
+    // captureWindow.webContents.openDevTools();// Open the DevTools.
+}
+function closeCaptureWindow() {
+    if (captureWindow) {
+        captureWindow.close();
+    }
+}
+function showCaptureWindow() {
+    const point = screen.getCursorScreenPoint()
+
+    console.log(point);
+
+    if (captureWindow) {
+        captureWindow.setPosition(point.x, point.y);
+        captureWindow.show();
+    } else {
+        createCaptureWindow();
+    }
+}
 function registerShortcut() {
     globalShortcut.register('Ctrl+ALT+S', () => {
         console.log('Ctrl+ALT+S is pressed');
-        
+
         if (isCapturing) {
             console.log('停止捕获');
-            
-            mainWindow.webContents.send('stop-capture');
+            captureWindow.webContents.send('stop-capture');
+            captureWindow.hide();
         } else {
             console.log('开始捕获');
-            
-            mainWindow.webContents.send('start-capture');
+            showCaptureWindow();
+            captureWindow.webContents.send('start-capture');
         }
         isCapturing = !isCapturing;
     });

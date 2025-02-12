@@ -1,25 +1,45 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "useDefineForClassFields": true,
+    "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
     "strict": true,
     "jsx": "preserve",
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "esModuleInterop": true,
-    "lib": [
-      "es6",
-      "dom"
-    ],
+    "moduleResolution": "node",
     "skipLibCheck": true,
-    "outDir": "dist/electron"
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "resolveJsonModule": true, //解决json文件引入报错问题
+    "allowJs": true,
+    "noImplicitAny": false, //是否在表达式和声明上有隐含的any类型时报错
+    "types": [
+      // "webpack-env"
+      "vite/client"
+    ],
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ],
+    "outDir": "dist"
   },
   "include": [
     "electron/**/*",
-    "types/**/*"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "references": [
     {

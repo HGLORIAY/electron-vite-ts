@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="home">
         home
     </div>
 </template>
@@ -20,5 +20,8 @@ function handleClick() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.home{
+    background-color: $color-main;
+}
 </style>

@@ -43,6 +43,25 @@ function createWindow() {
     createCaptureWindow()
     registerShortcut();
 
+}
+function createCaptureWindow() {
+    // 创建新的全屏窗口
+    captureWindow = new BrowserWindow({
+        backgroundColor: '#000',
+        fullscreen: true,
+        show: false,
+        focusable: false,   // 禁止获取焦点 
+        alwaysOnTop: true,  // 置顶显示 
+        webPreferences: {
+            contextIsolation: true, // 启用上下文隔离
+            nodeIntegration: false, // 禁用 Node.js 集成
+            preload: join(__dirname, '../preload/preload.js')
+        }
+    });
+    captureWindow.loadURL(winURL + '/capture');
+    // captureWindow.webContents.openDevTools();// Open the DevTools.
+    captureWindow.setIgnoreMouseEvents(true, { forward: true });
+
     ipcMain.handle('get-active-window-source', async () => {
         const sources = await desktopCapturer.getSources({ types: ['screen', 'window'], thumbnailSize: { width: 0, height: 0 } });
         for (const source of sources) {
@@ -52,21 +71,6 @@ function createWindow() {
         }
         return null;
     });
-}
-function createCaptureWindow() {
-    // 创建新的全屏窗口
-    captureWindow = new BrowserWindow({
-        backgroundColor: '#000',
-        fullscreen: true,
-        show: false,
-        webPreferences: {
-            contextIsolation: true, // 启用上下文隔离
-            nodeIntegration: false, // 禁用 Node.js 集成
-            preload: join(__dirname, '../preload/preload.js')
-        }
-    });
-    captureWindow.loadURL(winURL + '/capture');
-    // captureWindow.webContents.openDevTools();// Open the DevTools.
 }
 function closeCaptureWindow() {
     if (captureWindow) {
@@ -80,7 +84,7 @@ function showCaptureWindow() {
 
     if (captureWindow) {
         captureWindow.setPosition(point.x, point.y);
-        captureWindow.show();
+        captureWindow.showInactive();
     } else {
         createCaptureWindow();
     }

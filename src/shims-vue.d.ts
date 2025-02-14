@@ -3,6 +3,7 @@ interface Window {
         doSomething: () => void;
         sendToMain: (message: string) => void;
     };
+    electronAPI: any;
 }
 declare module '*.vue' {
     import { DefineComponent } from 'vue'
